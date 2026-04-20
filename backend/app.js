@@ -8,7 +8,9 @@ import { requestLogger } from './middleware/logger.js';
 const app = express();
 
 app.use(cors({
-  origin: config.cors.frontendUrl,
+  origin: config.cors.frontendUrl.includes(',') 
+    ? config.cors.frontendUrl.split(',').map(u => u.trim()) 
+    : config.cors.frontendUrl,
   credentials: true
 }));
 

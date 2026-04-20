@@ -1,38 +1,47 @@
-import { useState, useCallback } from 'react';
-import { Search, Plus, Upload, Filter, Mail, MoreVertical } from 'lucide-react';
+import { useState, useCallback, useEffect } from 'react';
+import { Search, Plus, Upload, Filter, Mail, MoreVertical, Loader2 } from 'lucide-react';
 import { BulkImportModal } from '../components/members/BulkImportModal';
+import { AddMemberModal } from '../components/members/AddMemberModal';
 import { useNotification } from '../context/NotificationContext';
+import { memberService } from '../services/memberService';
 
 export default function Members() {
   const notify = useNotification();
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [members, setMembers] = useState([]);
 
-  // Mock data as specified without backend for now
-  const [members, setMembers] = useState([
-    { id: 1, name: 'Alice Mumbah', email: 'alice@example.com', phone: '+254700000001', zone: 'Kisauni', status: 'Active', programs: ['Mentorship'] },
-    { id: 2, name: 'Bob Omondi', email: 'bob@example.com', phone: '+254700000002', zone: 'Nyali', status: 'Inactive', programs: [] },
-    { id: 3, name: 'Charlie Kariuki', email: 'charlie@example.com', phone: '+254700000003', zone: 'Mvita', status: 'Active', programs: ['Tech Hub', 'Arts'] },
-  ]);
+  const fetchMembers = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await memberService.getAll();
+      setMembers(data.members || []);
+    } catch {
+      notify.error('Failed to fetch members');
+    } finally {
+      setLoading(false);
+    }
+  }, [notify]);
+
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
 
   const handleBulkImport = async (parsedData) => {
-    // Mock import logic
-    notify.success(`Imported ${parsedData.length} members successfully.`);
-    const newMembers = parsedData.map((m, i) => ({
-      id: Date.now() + i,
-      name: m.Name || 'Unknown',
-      email: m.Email || '',
-      phone: m.Phone || '',
-      zone: m.Zone || 'Unassigned',
-      status: 'Active',
-      programs: m.Programs ? m.Programs.split(',') : []
-    }));
-    setMembers([...members, ...newMembers]);
+    try {
+      await memberService.bulkImport(parsedData);
+      notify.success(`Imported ${parsedData.length} members successfully.`);
+      fetchMembers();
+    } catch {
+      notify.error('Import failed. Please check your CSV format.');
+    }
   };
 
   const filteredMembers = members.filter(m => 
-    m.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    m.email.toLowerCase().includes(searchQuery.toLowerCase())
+    m.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    m.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -51,7 +60,10 @@ export default function Members() {
             <Upload className="w-4 h-4" /> Import CSV
           </button>
           
-          <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium shadow-sm transition-all text-sm">
+          <button 
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium shadow-sm transition-all text-sm"
+          >
             <Plus className="w-4 h-4" /> Add Member
           </button>
         </div>
@@ -89,18 +101,29 @@ export default function Members() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredMembers.map((member) => (
+              {loading ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                      <p>Loading members...</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredMembers.map((member) => (
                 <tr key={member.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200">
-                          {member.name.charAt(0)}
+                          {member.name?.charAt(0) || '?'}
                         </div>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">{member.name}</div>
-                        <div className="text-sm text-gray-500">{member.programs.join(', ') || 'No programs'}</div>
+                        <div className="text-sm text-gray-500">
+                          {member.programs?.map(p => typeof p === 'string' ? p : p.name).join(', ') || 'No programs'}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -109,15 +132,16 @@ export default function Members() {
                     <div className="text-sm text-gray-500 mt-1">{member.phone}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {member.zone}
+                    {member.zone?.name || member.zone || 'Unassigned'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      member.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {member.status}
-                    </span>
-                  </td>
+                   <td className="px-6 py-4 whitespace-nowrap">
+                     <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                       member.status === 'active' ? 'bg-green-100 text-green-800' : 
+                       member.status === 'at_risk' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800'
+                     }`}>
+                       {member.status?.replace('_', ' ') || 'Unknown'}
+                     </span>
+                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button className="text-gray-400 hover:text-gray-900 p-1 rounded-md hover:bg-gray-100 transition">
                       <MoreVertical className="w-5 h-5" />
@@ -148,6 +172,12 @@ export default function Members() {
         isOpen={isImportOpen} 
         onClose={() => setIsImportOpen(false)} 
         onImport={handleBulkImport} 
+      />
+
+      <AddMemberModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        onMemberAdded={fetchMembers} 
       />
     </div>
   );

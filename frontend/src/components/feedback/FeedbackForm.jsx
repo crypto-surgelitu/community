@@ -4,15 +4,15 @@ import { Star, MessageSquare } from 'lucide-react';
 import { sentimentEmoji } from '../../utils/helpers';
 import { useNotification } from '../../context/NotificationContext';
 
-export function FeedbackForm({ eventId, onSubmitComplete }) {
+export function FeedbackForm({ onSubmitComplete }) {
   const notify = useNotification();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [sentiment, setSentiment] = useState('');
   
-  const { register, handleSubmit, formState: { isSubmitting, errors }, reset } = useForm();
+  const { register, handleSubmit, formState: { isSubmitting }, reset } = useForm();
 
-  const handleManualSubmit = async (data) => {
+  const handleManualSubmit = async () => {
     if (rating === 0) {
       notify.error('Please provide a star rating.');
       return;
@@ -22,10 +22,8 @@ export function FeedbackForm({ eventId, onSubmitComplete }) {
       return;
     }
     
-    // Format full payload
-    const payload = { ...data, rating, sentiment, eventId };
     try {
-      // await feedbackService.submitFeedback(eventId, payload);
+      // await feedbackService.submitFeedback(eventId, { ...data, rating, sentiment, eventId });
       // Simulate network request
       await new Promise(r => setTimeout(r, 600));
       notify.success('Thank you for your feedback!');

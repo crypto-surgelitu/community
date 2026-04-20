@@ -21,7 +21,6 @@ export function EventForm({ onSubmit, defaultValues }) {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    watch,
   } = useForm({
     resolver: zodResolver(eventSchema),
     mode: 'onChange',
@@ -41,16 +40,15 @@ export function EventForm({ onSubmit, defaultValues }) {
             <label className="block text-sm font-medium text-gray-700">Event Name *</label>
             <input 
               {...register('name')} 
-              className={`mt-1 block w-full border border-gray-200 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm ${errors.name ? 'border-red-300' : ''}`}
+              className="mt-1 block w-full border border-gray-200 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
             />
-            {errors.name && <span className="text-red-500 text-xs mt-1 block">{errors.name.message}</span>}
           </div>
 
           <div className="sm:col-span-2">
             <label className="block text-sm font-medium text-gray-700">Event Type *</label>
             <select 
               {...register('eventType')}
-              className={`mt-1 block w-full border border-gray-200 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm ${errors.eventType ? 'border-red-300' : ''}`}
+              className="mt-1 block w-full border border-gray-200 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
             >
               <option value="">Select type...</option>
               <option value="workshop">Workshop</option>
@@ -58,7 +56,6 @@ export function EventForm({ onSubmit, defaultValues }) {
               <option value="social">Social</option>
               <option value="mentorship">Mentorship</option>
             </select>
-            {errors.eventType && <span className="text-red-500 text-xs mt-1 block">{errors.eventType.message}</span>}
           </div>
 
           <div className="sm:col-span-6">

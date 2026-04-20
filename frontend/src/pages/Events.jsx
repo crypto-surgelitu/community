@@ -1,10 +1,31 @@
-import { useState } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RecentEventsList } from '../components/dashboard/RecentEventsList';
+import { eventService } from '../services/eventService';
+import { useNotification } from '../context/NotificationContext';
 
 export default function Events() {
   const [view, setView] = useState('list'); // list or calendar
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const notify = useNotification();
+
+  const fetchEvents = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await eventService.getAll();
+      setEvents(data.events || []);
+    } catch {
+      notify.error('Failed to load events');
+    } finally {
+      setLoading(false);
+    }
+  }, [notify]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
@@ -39,8 +60,14 @@ export default function Events() {
       {view === 'list' ? (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
            <div className="lg:col-span-3">
-             {/* Reused from dashbaord for now to emulate the list */}
-             <RecentEventsList />
+             {loading ? (
+               <div className="bg-white p-12 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-3">
+                 <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                 <p className="text-gray-500">Loading events...</p>
+               </div>
+             ) : (
+               <RecentEventsList events={events} />
+             )}
            </div>
            
            <div className="lg:col-span-1 space-y-4">
@@ -49,8 +76,8 @@ export default function Events() {
                     <CalendarIcon className="w-6 h-6" />
                  </div>
                  <h3 className="font-bold text-gray-900">Total Events</h3>
-                 <p className="text-3xl font-black text-gray-900 mt-2">18</p>
-                 <p className="text-sm text-gray-500 mt-1">Scheduled this month</p>
+                 <p className="text-3xl font-black text-gray-900 mt-2">{events.length}</p>
+                 <p className="text-sm text-gray-500 mt-1">Scheduled in system</p>
               </div>
            </div>
         </div>

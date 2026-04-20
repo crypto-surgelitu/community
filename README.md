@@ -1,38 +1,90 @@
 # Swahilipot Hub Community Manager
 
-This is the frontend Vite + React application corresponding to the Swahilipot Hub Community Manager platform.
+Welcome to the **Swahilipot Hub Community Manager** platform, a comprehensive system for managing community engagement, members, and events. This system is designed for high-performance management tasks including member registration, event scheduling, and real-time dashboard analytics.
 
-## Features Built
-- **Responsive Dashboard**: Animated Rechart data displays representing member engagement metrics.
-- **Role-Based Workflows**: Protected route architecture mapped to Admin, Community Manager, and Case Manager access rules.
-- **Event Check-In Systems**: Automated Event QR code generation paired with validation tooling.
-- **Bulk CSV Data Loading**: Uses react-dropzone and papaparse for massive dataset ingestion.
-- **Case Management Hub**: Direct integrations with Message template libraries, fast SMS generation tabs, and event history checking.
+---
 
-## Technologies Used
-- React v18+ & Vite v6
-- Tailwind CSS v4 & Framer Motion
-- React Hook Form + Zod Validations
-- Axios, Lucide React, Recharts, QRCode React
-- React Hot Toast Notifications
+## 🚀 Key Features
 
-## Getting Started
+### 1. Unified Dashboard
+- **Live Metrics**: Real-time counts for total members, active events, and attendance rates.
+- **Engagement Analytics**: Visual trends for member growth and event feedback sentiment.
+- **At-Risk Monitoring**: Automated identification of members who haven't attended events recently.
 
-1. Set your backend location inside `.env.local`:
-```env
-VITE_API_BASE_URL=http://localhost:5000/api
-VITE_APP_NAME="Swahilipot Community Manager"
-VITE_QR_CODE_NAMESPACE=swahilipot-event
-```
+### 2. Member Management
+- **Add Single Members**: Dedicated modal for quick registration with regional (Zone) assignment.
+- **Bulk CSV Import**: Powerful importer for migrating large datasets (up to 500 members per batch).
+- **Member Timeline**: Full history of event attendance and feedback for each member.
 
-2. Run the application logic:
-```bash
-cd frontend
-npm install
-npm run dev
-```
+### 3. Event Management
+- **Dynamic Scheduling**: Create events linked to specific Programs (Mentorship, Workshops).
+- **QR Code Integration**: Generates unique identifiers for event check-ins.
+- **Conflict Detection**: Prevents overlapping events in the same location.
 
-3. Open `http://localhost:5173` to interact with the frontend application.
+### 4. Role-Based Access Control
+- **Admin**: Full system management (Users, Programs, Backups).
+- **Community Manager**: Member registration and event oversight.
+- **Case Manager**: Direct member engagement and followup.
 
-## Author & Acknowledgements
-Built by Gemini (with Antigravity agent integration) mirroring premium design specifications from the Frontend Product Requirements Document (FPRD).
+---
+
+## 🛠 Setup & Installation (Zero-to-Hero)
+
+### Prerequisites
+- **Node.js**: v18 or higher.
+- **MySQL**: (via XAMPP or standalone). Default port 3306.
+
+### Step 1: Backend Setup
+1. **Database Configuration**:
+   - Ensure MySQL is running.
+   - Configure `backend/.env`:
+     ```env
+     DB_HOST=127.0.0.1
+     DB_PORT=3306
+     DB_NAME=swahilipot_community_db
+     DB_USER=root
+     DB_PASSWORD=
+     ```
+
+2. **Database Initialization**:
+   - Install dependencies: `npm install`
+   - Create Database: `node create-db.js`
+   - Run Migrations: `npx sequelize-cli db:migrate`
+   - Seed Initial Data: `npx sequelize-cli db:seed:all`
+
+3. **Start the Server**:
+   - `npm start`
+   - Verify log: `Database connection established successfully.`
+
+### Step 2: Frontend Setup
+1. **Configure Environment**:
+   - Edit `frontend/.env.local`:
+     ```env
+     VITE_API_BASE_URL=http://localhost:5000/api
+     ```
+
+2. **Start the Development Server**:
+   - `npm install`
+   - `npm run dev`
+
+---
+
+## 🔍 Troubleshooting
+
+### 1. `ECONNREFUSED` on port 3306
+- **Problem**: Backend cannot reach MySQL.
+- **Fix**: Ensure XAMPP's MySQL service is **Started**. If using a custom port, update `DB_PORT` in your `.env`.
+
+### 2. `EADDRINUSE` on port 5000
+- **Problem**: Port 5000 is already occupied.
+- **Fix**: Run `Stop-Process -Id (Get-NetTCPConnection -LocalPort 5000).OwningProcess -Force` in PowerShell (Windows) to clear it.
+
+### 3. Missing Migration method: `up`
+- **Problem**: Old seeder format in ES modules.
+- **Fix**: Ensure your seeder uses `export default { up: async (queryInterface, Sequelize) => { ... } }`.
+
+---
+
+## 🏗 Built By
+**Antigravity** for the **Swahilipot Hub** team.
+Dedicated to data-driven community empowerment.

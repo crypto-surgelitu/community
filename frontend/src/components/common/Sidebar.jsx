@@ -6,11 +6,12 @@ import {
   Users, 
   Briefcase, 
   Settings,
-  LogOut
+  LogOut,
+  X
 } from 'lucide-react';
 import { ROUTES } from '../../utils/constants';
 
-export function Sidebar() {
+export function Sidebar({ onClose }) {
   const { user, logout } = useAuth();
   const location = useLocation();
 
@@ -28,8 +29,16 @@ export function Sidebar() {
 
   return (
     <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col h-full border-r border-slate-800 shrink-0">
-      <div className="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-950 text-white font-bold text-xl tracking-tight">
-        <span className="text-blue-500 mr-2">S</span>Hub Manager
+      <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-950 text-white font-bold text-xl tracking-tight">
+        <div className="flex items-center">
+          <span className="text-blue-500 mr-2">S</span>Hub Manager
+        </div>
+        <button 
+          onClick={onClose}
+          className="lg:hidden p-2 rounded-lg hover:bg-slate-800 transition"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
       
       <div className="flex-1 overflow-y-auto py-4">

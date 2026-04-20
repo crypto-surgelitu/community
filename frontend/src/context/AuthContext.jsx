@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/authService';
 
@@ -9,11 +10,10 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // On mount, check if token exists and validate
     const token = localStorage.getItem('token');
     if (token) {
       authService.getMe()
-        .then((response) => setUser(response.data || response))
+        .then((response) => setUser(response.data))
         .catch(() => {
           localStorage.removeItem('token');
           setUser(null);
@@ -29,11 +29,26 @@ export function AuthProvider({ children }) {
     setError(null);
     try {
       const response = await authService.login(email, password);
-      // Depending on backend structure, User usually comes under response.user
-      setUser(response.user || response.data);
+      setUser(response.user);
       return response;
     } catch (err) {
       setError(err.response?.data?.message || err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signup = async (userData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await authService.signup(userData);
+      setUser(response.user);
+      return response;
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || err.message;
+      setError(errorMsg);
       throw err;
     } finally {
       setLoading(false);
@@ -46,7 +61,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );

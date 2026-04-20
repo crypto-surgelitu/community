@@ -6,20 +6,29 @@ const api = axios.create({
   timeout: 10000,
 });
 
+// Attach auth token to requests if available
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired, redirect to login
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
     if (error.response?.status === 403) {
-      // Permission denied
       toast.error('You do not have permission to do this');
     }
     if (error.response?.status === 500) {
-      // Server error
       toast.error('Server error. Please try again later.');
     }
     return Promise.reject(error);

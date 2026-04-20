@@ -3,11 +3,13 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Events from './pages/Events';
 import Members from './pages/Members';
 import Settings from './pages/Settings';
 import CaseManagerWork from './pages/CaseManagerWork';
+import EventForm from './pages/EventForm';
 import NotFound from './pages/NotFound';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
@@ -27,6 +29,24 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
   return <DashboardLayout>{children}</DashboardLayout>;
 }
 
+function PublicRoute({ children }) {
+  const { user, loading } = useAuth();
+  
+  if (loading) return <LoadingSpinner />;
+  
+  if (user) return <Navigate to="/dashboard" />;
+  
+  return children;
+}
+
+function HomeLoader() {
+  const { user, loading } = useAuth();
+  
+  if (loading) return <LoadingSpinner />;
+  
+  return user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />;
+}
+
 export default function App() {
   return (
     <ErrorBoundary>
@@ -34,9 +54,18 @@ export default function App() {
         <AuthProvider>
           <Toaster position="top-right" />
           <Routes>
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            } />
+            <Route path="/signup" element={
+              <PublicRoute>
+                <Signup />
+              </PublicRoute>
+            } />
             
-            <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route path="/" element={<HomeLoader />} />
             
             <Route path="/dashboard" element={
               <ProtectedRoute>
@@ -50,9 +79,15 @@ export default function App() {
               </ProtectedRoute>
             } />
             
-            <Route path="/members" element={
+<Route path="/members" element={
               <ProtectedRoute>
                 <Members />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/events/new" element={
+              <ProtectedRoute>
+                <EventForm />
               </ProtectedRoute>
             } />
             

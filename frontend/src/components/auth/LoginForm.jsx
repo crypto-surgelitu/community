@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
 import { ROUTES } from '../../utils/constants';
 import { LogIn, Loader2, Mail, Lock } from 'lucide-react';
@@ -44,12 +44,13 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-1">
-        <label className="text-sm font-medium text-gray-700">Email Address</label>
+        <label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
             <Mail className="h-5 w-5" />
           </div>
           <input
+            id="email"
             {...register('email')}
             type="email"
             autoComplete="email"
@@ -68,7 +69,7 @@ export function LoginForm() {
 
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-gray-700">Password</label>
+            <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
             <a href="#" className="text-xs font-medium text-blue-600 hover:text-blue-500">Forgot password?</a>
         </div>
         <div className="relative">
@@ -76,6 +77,7 @@ export function LoginForm() {
             <Lock className="h-5 w-5" />
           </div>
           <input
+            id="password"
             {...register('password')}
             type="password"
             autoComplete="current-password"
@@ -109,6 +111,13 @@ export function LoginForm() {
           </>
         )}
       </button>
+      
+      <p className="text-center text-sm text-gray-600 pt-2">
+        Don't have an account?{' '}
+        <Link to="/signup" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline transition-all">
+          Create one now
+        </Link>
+      </p>
     </form>
   );
 }

@@ -1,7 +1,7 @@
-import { LoginForm } from '../components/auth/LoginForm';
+import { SignupForm } from '../components/auth/SignupForm';
 import { motion } from 'framer-motion';
 
-export default function Login() {
+export default function Signup() {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <motion.div 
@@ -17,13 +17,13 @@ export default function Login() {
                 S
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-center text-gray-900">Welcome Back</h2>
+            <h2 className="text-2xl font-bold text-center text-gray-900">Create an Account</h2>
             <p className="text-center text-gray-500 mt-2 text-sm">
-              Sign in to manage the Swahilipot Hub Community
+              Join the Swahilipot Hub Community Platform
             </p>
           </div>
           <div className="p-8 pt-6">
-            <LoginForm />
+            <SignupForm />
           </div>
         </div>
         

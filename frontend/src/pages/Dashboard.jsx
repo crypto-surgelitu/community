@@ -1,14 +1,59 @@
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { MetricCard } from '../components/dashboard/MetricCard';
 import { ProgramChart } from '../components/dashboard/ProgramChart';
 import { RecentEventsList } from '../components/dashboard/RecentEventsList';
 import { AtRiskMembersList } from '../components/dashboard/AtRiskMembersList';
-import { Users, CalendarDays, TrendingUp, MessageCircle } from 'lucide-react';
+import { Users, CalendarDays, TrendingUp, MessageCircle, Loader2 } from 'lucide-react';
+import { memberService } from '../services/memberService';
+import { eventService } from '../services/eventService';
+import { dashboardService } from '../services/dashboardService';
+import { useNotification } from '../context/NotificationContext';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const notify = useNotification();
+  const [stats, setStats] = useState({
+    totalMembers: 0,
+    activePrograms: 12,
+    eventsThisMonth: 0,
+    satisfaction: 4.8
+  });
+  const [recentEvents, setRecentEvents] = useState([]);
+  const [programData, setProgramData] = useState([]);
+  const [atRiskMembers, setAtRiskMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
   
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [membersData, eventsData, programsData, atRiskData] = await Promise.all([
+        memberService.getAll(),
+        eventService.getAll(),
+        dashboardService.getPrograms(),
+        dashboardService.getAtRiskMembers()
+      ]);
+      
+      setStats(prev => ({
+        ...prev,
+        totalMembers: membersData.total || 0,
+        eventsThisMonth: eventsData.events?.length || 0,
+      }));
+      setRecentEvents(eventsData.events || []);
+      setProgramData(programsData);
+      setAtRiskMembers(atRiskData);
+    } catch {
+      notify.error('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  }, [notify]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -27,6 +72,15 @@ export default function Dashboard() {
       transition: { duration: 0.4, ease: "easeOut" },
     },
   };
+
+  if (loading) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+        <p className="text-gray-500 font-medium">Loading your dashboard...</p>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -58,7 +112,7 @@ export default function Dashboard() {
         <motion.div variants={itemVariants}>
           <MetricCard 
             title="Total Members" 
-            value={1425} 
+            value={stats.totalMembers} 
             icon={<Users className="w-6 h-6 text-blue-600" />}
             colorClass="text-blue-600"
             trend={{ value: 12.5, isPositive: true }}
@@ -68,7 +122,7 @@ export default function Dashboard() {
         <motion.div variants={itemVariants}>
           <MetricCard 
             title="Active Programs" 
-            value={24} 
+            value={stats.activePrograms} 
             icon={<TrendingUp className="w-6 h-6 text-green-600" />}
             colorClass="text-green-600"
             trend={{ value: 4.2, isPositive: true }}
@@ -77,8 +131,8 @@ export default function Dashboard() {
         
         <motion.div variants={itemVariants}>
           <MetricCard 
-            title="Events This Month" 
-            value={18} 
+            title="Events Summary" 
+            value={stats.eventsThisMonth} 
             icon={<CalendarDays className="w-6 h-6 text-amber-500" />}
             colorClass="text-amber-500"
             trend={{ value: 2.1, isPositive: false }}
@@ -88,7 +142,7 @@ export default function Dashboard() {
         <motion.div variants={itemVariants}>
           <MetricCard 
             title="Avg Satisfaction" 
-            value={4.6} 
+            value={stats.satisfaction} 
             icon={<MessageCircle className="w-6 h-6 text-purple-600" />}
             colorClass="text-purple-600"
             trend={{ value: 0.2, isPositive: true }}
@@ -98,16 +152,22 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <motion.div variants={itemVariants} className="lg:col-span-2">
-          <ProgramChart />
+          <ProgramChart 
+            data={programData.map(p => ({
+              name: p.name,
+              active: p.totalAttendance,
+              completed: p.eventsTotal
+            }))}
+          />
         </motion.div>
         
         <motion.div variants={itemVariants} className="lg:col-span-1">
-          <RecentEventsList />
+          <RecentEventsList events={recentEvents} />
         </motion.div>
       </div>
 
       <motion.div variants={itemVariants} className="pt-2">
-        <AtRiskMembersList />
+        <AtRiskMembersList members={atRiskMembers} />
       </motion.div>
       
     </motion.div>

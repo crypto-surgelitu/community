@@ -118,26 +118,55 @@ export const memberService = {
       throw new Error(`Maximum ${maxImport} members per import`);
     }
     
+    // Preload zones for name->ID mapping
+    const zones = await Zone.findAll({ attributes: ['id', 'name'] });
+    const zoneMap = {};
+    zones.forEach(z => {
+      if (z.name) zoneMap[z.name.toLowerCase()] = z.id;
+    });
+    
     const results = { imported: 0, failed: 0, errors: [] };
     
-    for (const memberData of membersData) {
+    for (const rawData of membersData) {
       try {
+        // Normalize keys to lowercase (handle CSV header casing)
+        const memberData = {};
+        Object.keys(rawData).forEach(key => {
+          const lower = key.toLowerCase();
+          memberData[lower] = rawData[key];
+        });
+        
+        // Resolve zone name to zoneId if zone provided without zoneId
+        if (memberData.zone && !memberData.zoneId) {
+          const zoneId = zoneMap[memberData.zone.toLowerCase()];
+          if (zoneId) {
+            memberData.zoneId = zoneId;
+          } else {
+            throw new Error(`Zone "${memberData.zone}" not found`);
+          }
+        }
+        // Remove zone field (not a column)
+        delete memberData.zone;
+        
         const existing = await Member.findOne({ where: { phone: memberData.phone } });
         if (existing) {
-          results.failed++;
-          results.errors.push(`Phone ${memberData.phone} already exists`);
-          continue;
+          throw new Error(`Phone ${memberData.phone} already exists`);
         }
         
+        // Only take allowed fields
+        const { name, phone, email, zoneId } = memberData;
         await Member.create({
-          ...memberData,
+          name,
+          phone,
+          email: email || null,
+          zoneId,
           createdBy: userId
         });
         
         results.imported++;
       } catch (error) {
         results.failed++;
-        results.errors.push(`${memberData.phone}: ${error.message}`);
+        results.errors.push(`${error.message}`);
       }
     }
     

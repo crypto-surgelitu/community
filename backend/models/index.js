@@ -18,6 +18,9 @@ Event.belongsTo(User, { foreignKey: 'organizerId', as: 'organizer' });
 Zone.hasMany(Member, { foreignKey: 'zoneId', as: 'members' });
 Member.belongsTo(Zone, { foreignKey: 'zoneId', as: 'zone' });
 
+Zone.hasMany(User, { foreignKey: 'zoneId', as: 'users' });
+User.belongsTo(Zone, { foreignKey: 'zoneId', as: 'zone' });
+
 User.hasMany(Member, { foreignKey: 'createdBy', as: 'createdMembers' });
 Member.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' });
 

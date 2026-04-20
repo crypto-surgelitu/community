@@ -2,11 +2,22 @@ import api from '../utils/api';
 
 export const eventService = {
   getAll: async (filters = {}) => {
-    // try to fetch real data, fallback to empty array or mocked data if 404
     try {
       const { data } = await api.get('/events', { params: filters });
-      return data;
-    } catch (e) {
+      const events = (data.events || []).map(event => ({
+        id: event.id,
+        name: event.title,
+        date: event.eventDate,
+        location: event.location,
+        capacity: event.maxCapacity,
+        attendees: event.attendanceCount,
+        status: event.status,
+        program: event.program,
+        organizer: event.organizer,
+        zone: event.zone
+      }));
+      return { events, total: data.total };
+    } catch {
       return { events: [], total: 0 };
     }
   },
@@ -44,5 +55,10 @@ export const eventService = {
   publishEvent: async (eventId) => {
     const { data } = await api.post(`/events/${eventId}/publish`);
     return data;
+  },
+  
+  getPrograms: async () => {
+    const { data } = await api.get('/dashboard/programs');
+    return data.programs || [];
   }
 };

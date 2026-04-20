@@ -5,7 +5,7 @@ export const memberService = {
     try {
       const { data } = await api.get('/members', { params: filters });
       return data;
-    } catch (error) {
+    } catch {
       return { members: [], total: 0 };
     }
   },
@@ -44,5 +44,10 @@ export const memberService = {
   sendMessage: async (memberId, message) => {
     const { data } = await api.post(`/members/${memberId}/message`, { message });
     return data;
+  },
+  
+  getZones: async () => {
+    const { data } = await api.get('/dashboard/zones');
+    return data.zones || [];
   }
 };

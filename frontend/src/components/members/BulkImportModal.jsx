@@ -38,10 +38,19 @@ export function BulkImportModal({ isOpen, onClose, onImport }) {
     if (!parsedData.length) return;
     setIsProcessing(true);
     try {
-      await onImport(parsedData);
+      // Normalize CSV headers to lowercase for backend compatibility
+      const normalizedData = parsedData.map(record => {
+        const normalized = {};
+        Object.keys(record).forEach(key => {
+          normalized[key.toLowerCase()] = record[key];
+        });
+        return normalized;
+      });
+      
+      await onImport(normalizedData);
       setParsedData([]);
       onClose();
-    } catch (e) {
+    } catch {
       // notify.error inside onImport
     } finally {
       setIsProcessing(false);

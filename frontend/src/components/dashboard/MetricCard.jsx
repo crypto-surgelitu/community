@@ -7,7 +7,8 @@ export function MetricCard({ title, value, icon, trend, colorClass = "text-blue-
   
   useEffect(() => {
     springValue.set(value);
-    setHasStarted(true);
+    const timer = setTimeout(() => setHasStarted(true), 100);
+    return () => clearTimeout(timer);
   }, [value, springValue]);
 
   const displayValue = useTransform(springValue, (current) => Math.round(current));

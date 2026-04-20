@@ -3,14 +3,30 @@ import api from '../utils/api';
 export const authService = {
   login: async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
-    // Store token
-    localStorage.setItem('token', data.token);
-    api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+    
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+    }
+    
+    return data;
+  },
+
+  signup: async (userData) => {
+    const { data } = await api.post('/auth/signup', userData);
+    
+    // CRITICAL: Must persist the token so the app sees the user as logged in
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+    }
+    
     return data;
   },
   
   logout: () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     delete api.defaults.headers.common['Authorization'];
   },
   

@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { User, Shield, Bell, Key, Database, Server } from 'lucide-react';
 import { useNotification } from '../context/NotificationContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Settings() {
   const notify = useNotification();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('account');
 
   const navItems = [
@@ -49,19 +51,36 @@ export default function Settings() {
           </nav>
         </div>
 
-        <div className="flex-1 bg-white border border-gray-200 rounded-xl shadow-sm p-6 lg:p-8 min-h-[500px]">
+        <div className="flex-1 bg-white border border-gray-200 rounded-xl shadow-sm p-6 lg:p-8 min-h-[500px] overflow-y-auto">
           {activeTab === 'account' && (
             <div className="max-w-2xl">
               <h2 className="text-xl font-bold text-gray-900 mb-6">Profile Settings</h2>
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                  <input type="text" defaultValue="Admin User" className="w-full border-gray-300 border rounded-lg py-2 px-3 focus:ring-2 focus:ring-blue-500" />
+                  <input 
+                    type="text" 
+                    defaultValue={user?.name || ''} 
+                    className="w-full border-gray-300 border rounded-lg py-2 px-3 focus:ring-2 focus:ring-blue-500" 
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                  <input type="email" defaultValue="admin@swahilipothub.co.ke" className="w-full border-gray-300 border rounded-lg py-2 px-3 focus:ring-2 focus:ring-blue-500 bg-gray-50" readOnly />
-                  <p className="text-xs text-gray-500 mt-1">Email address is read-only. Contact IT to change.</p>
+                  <input 
+                    type="email" 
+                    defaultValue={user?.email || ''} 
+                    className="w-full border-gray-300 border rounded-lg py-2 px-3 focus:ring-2 focus:ring-blue-500 bg-gray-50" 
+                    readOnly 
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Email address is managed via your account provider and is read-only.</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Role</label>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold uppercase">
+                      {user?.role?.replace('_', ' ') || 'User'}
+                    </span>
+                  </div>
                 </div>
                 <div className="pt-4 flex justify-end">
                    <button onClick={handleSave} className="bg-blue-600 text-white font-medium px-4 py-2 rounded-lg shadow disabled:opacity-50 hover:bg-blue-700 transition">Save Changes</button>

@@ -7,6 +7,7 @@ import { schemas } from '../utils/validators.js';
 const router = express.Router();
 
 router.post('/login', validate(schemas.login), authController.login);
+router.post('/signup', validate(schemas.signup), authController.signup);
 router.get('/me', authenticate, authController.getMe);
 router.post('/change-password', authenticate, validate(schemas.changePassword), authController.changePassword);
 
