@@ -5,6 +5,13 @@ export const schemas = {
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required()
   }),
+  
+  signup: Joi.object({
+    name: Joi.string().min(3).max(255).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(8).required(),
+    zone: Joi.string().required()
+  }),
 
   changePassword: Joi.object({
     oldPassword: Joi.string().min(8).required(),
@@ -61,9 +68,10 @@ export const schemas = {
       Joi.object({
         name: Joi.string().min(3).max(255).required(),
         phone: Joi.string().pattern(/^\+?[0-9]{10,15}$/).required(),
-        email: Joi.string().email().allow(null),
-        zoneId: Joi.string().uuid().allow(null)
-      })
+        email: Joi.string().email().allow(null).optional(),
+        zone: Joi.string().allow(null).optional(),
+        zoneId: Joi.string().uuid().allow(null).optional()
+      }).unknown(true)
     ).min(1).max(500).required()
   }),
 

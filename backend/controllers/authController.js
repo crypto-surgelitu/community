@@ -15,6 +15,19 @@ export const authController = {
       }
     }
   },
+  
+  async signup(req, res, next) {
+    try {
+      const result = await authService.signup(req.validatedBody);
+      res.status(201).json(result);
+    } catch (error) {
+      if (error.message === 'User with this email already exists') {
+        res.status(400).json({ error: error.message, status: 400 });
+      } else {
+        next(error);
+      }
+    }
+  },
 
   async getMe(req, res, next) {
     try {

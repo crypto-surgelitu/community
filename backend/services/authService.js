@@ -70,6 +70,41 @@ export const authService = {
     return { message: 'Password changed successfully' };
   },
 
+  async signup(data) {
+    const { Zone } = await import('../models/index.js');
+    
+    const existingUser = await User.findOne({ where: { email: data.email } });
+    if (existingUser) {
+      throw new Error('User with this email already exists');
+    }
+    
+    // Resolve zone name to ID if provided
+    let zoneId = null;
+    if (data.zone) {
+      const zone = await Zone.findOne({ where: { name: data.zone } });
+      if (zone) {
+        zoneId = zone.id;
+      } else {
+        // Optionally create the zone if not found, but for now we follow seeder
+        logger.warn('Signup - Zone not found', { zoneName: data.zone });
+      }
+    }
+    
+    const user = await User.create({
+      email: data.email,
+      password: data.password, // hashed by model hook
+      name: data.name,
+      zoneId: zoneId,
+      role: 'case_manager', // default role for self-signup
+      status: 'active'
+    });
+    
+    logger.log('New user signed up', { userId: user.id, email: user.email });
+    
+    // Auto-login after signup
+    return this.login(data.email, data.password);
+  },
+
   async getUserById(userId) {
     const user = await User.findByPk(userId);
     if (!user) return null;

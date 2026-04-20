@@ -26,5 +26,14 @@ export const dashboardController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  async getZones(req, res, next) {
+    try {
+      const result = await dashboardService.getZones();
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
   }
 };

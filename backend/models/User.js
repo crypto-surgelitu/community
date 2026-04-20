@@ -38,6 +38,11 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE,
     field: 'last_login_at',
     allowNull: true
+  },
+  zoneId: {
+    type: DataTypes.UUID,
+    field: 'zone_id',
+    allowNull: true
   }
 }, {
   tableName: 'users',

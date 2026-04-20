@@ -106,27 +106,42 @@ export const dashboardService = {
           { lastAttendanceDate: { [Op.lt]: cutoffDate } },
           { lastAttendanceDate: null }
         ]
-      }
+      },
+      include: [
+        { model: Zone, as: 'zone', attributes: ['id', 'name'] }
+      ]
     });
     
-    const atRiskWithDays = atRiskMembers.map(m => {
-      const days = m.lastAttendanceDate 
-        ? Math.floor((new Date() - new Date(m.lastAttendanceDate)) / (1000 * 60 * 60 * 24))
-        : null;
-      
-      return {
-        id: m.id,
-        name: m.name,
-        phone: m.phone,
-        lastAttendance: m.lastAttendanceDate,
-        daysSinceLastAttendance: days,
-        riskLevel: days === null ? 'high' : days > 30 ? 'high' : days > 15 ? 'medium' : 'low'
-      };
-    });
+    const atRiskWithDays = await Promise.all(
+      atRiskMembers.map(async (m) => {
+        const eventCount = await Attendance.count({ where: { memberId: m.id } });
+        const days = m.lastAttendanceDate 
+          ? Math.floor((new Date() - new Date(m.lastAttendanceDate)) / (1000 * 60 * 60 * 24))
+          : null;
+        
+        return {
+          id: m.id,
+          name: m.name,
+          phone: m.phone,
+          zone: m.zone,
+          lastSeen: m.lastAttendanceDate,
+          eventCount,
+          daysSinceLastAttendance: days,
+          riskLevel: days === null ? 'high' : days > 30 ? 'high' : days > 15 ? 'medium' : 'low'
+        };
+      })
+    );
     
     return {
       atRiskMembers: atRiskWithDays,
       count: atRiskWithDays.length
     };
+  },
+
+  async getZones() {
+    const zones = await Zone.findAll({
+      attributes: ['id', 'name', 'color']
+    });
+    return { zones };
   }
 };
