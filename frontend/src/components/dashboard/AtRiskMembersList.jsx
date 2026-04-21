@@ -16,58 +16,55 @@ export function AtRiskMembersList({ members = [] }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
-      <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <AlertTriangle className="w-5 h-5 text-amber-500" />
-          <h3 className="text-lg font-bold text-gray-900">At-Risk Members</h3>
-        </div>
-        <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-md">{members.length} Flagged</span>
-      </div>
-      
-      <div className="divide-y divide-gray-100 flex-1 overflow-y-auto">
+    <div className="flex flex-col h-full">
+      <div className="space-y-2 flex-1 overflow-y-auto">
         {members.map((member) => {
           const engagement = getEngagementLevel(member.eventCount || 0);
           return (
-            <div key={member.id} className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 font-bold shrink-0">
+            <div key={member.id} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:bg-surface-low rounded-[24px] transition-all duration-300 group">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-surface-lowest border-2 border-surface-low flex items-center justify-center text-primary font-bold shrink-0 text-lg shadow-sm group-hover:scale-105 transition-transform">
                   {member.name?.charAt(0) || '?'}
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 text-sm">{member.name}</h4>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                    <span className="px-2 py-0.5 bg-gray-100 rounded text-gray-600">{member.zone?.name || member.zone || 'Unassigned'}</span>
+                  <h4 className="font-bold text-on-surface text-[17px] mb-1">{member.name}</h4>
+                  <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant/60">
+                    <span className="px-3 py-1 bg-surface-lowest rounded-full">{member.zone?.name || member.zone || 'Unassigned'}</span>
                     <span>•</span>
-                    <span>{member.lastSeen || 'Status unknown'}</span>
+                    <span className="text-primary">{member.lastSeen || 'Status unknown'}</span>
                   </div>
                 </div>
               </div>
               
-              <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
-                <div className="flex flex-col items-start sm:items-end w-24">
-                  <span className="text-xs text-gray-500 mb-1">Engagement</span>
-                  <div className="flex items-end gap-[2px] h-3">
+              <div className="flex items-center justify-between sm:justify-end gap-8 w-full sm:w-auto">
+                <div className="flex flex-col items-start sm:items-end">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant/40 mb-2">Retention</span>
+                  <div className="flex items-end gap-1 h-4">
                     {[1, 2, 3].map((bar) => (
                       <div 
                         key={bar} 
-                        className={`w-1.5 rounded-t-sm ${bar <= engagement.bars ? 'bg-amber-500' : 'bg-gray-200'}`}
-                        style={{ height: `${bar * 33}%`, backgroundColor: bar <= engagement.bars ? engagement.color : '' }}
+                        className={`w-2.5 rounded-full transition-all duration-500 ${bar <= engagement.bars ? '' : 'bg-surface-low'}`}
+                        style={{ 
+                          height: `${bar * 33 + 33}%`, 
+                          backgroundColor: bar <= engagement.bars ? engagement.color : '' 
+                        }}
                       />
                     ))}
                   </div>
                 </div>
                 
-                <Link to={`/mywork?action=message&user=${member.id}`} className="p-2 text-blue-600 hover:bg-blue-50 bg-white border border-blue-100 rounded-lg transition-colors">
-                  <MessageSquare className="w-4 h-4" />
+                <Link to={`/mywork?action=message&user=${member.id}`} className="p-4 bg-primary text-white rounded-2xl shadow-lg shadow-primary/20 hover:scale-110 active:scale-95 transition-all duration-200">
+                  <MessageSquare className="w-5 h-5" />
                 </Link>
               </div>
             </div>
           );
         })}
       </div>
-      <div className="p-3 border-t border-gray-100 bg-gray-50 text-center">
-        <Link to="/members?filter=at-risk" className="text-sm text-gray-600 hover:text-gray-900 font-medium">View detailed member engagement report &rarr;</Link>
+      <div className="mt-10 text-center">
+        <Link to="/members?filter=at-risk" className="text-[13px] font-bold text-on-surface-variant hover:text-primary uppercase tracking-widest transition-colors">
+          View full retention report &rarr;
+        </Link>
       </div>
     </div>
   );

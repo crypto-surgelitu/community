@@ -13,34 +13,40 @@ export function RecentEventsList({ events }) {
   const displayEvents = events?.length ? events : defaultEvents;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
-      <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-        <h3 className="text-lg font-bold text-gray-900">Upcoming Events</h3>
-        <Link to="/events" className="text-sm text-blue-600 hover:text-blue-700 font-medium pb-0.5 border-b border-transparent hover:border-blue-600 transition-all">View all</Link>
+    <div className="flex flex-col h-full">
+      <div className="flex justify-between items-center mb-8">
+        <h3 className="text-xl font-bold text-on-surface">Upcoming Events</h3>
+        <Link to="/events" className="text-[13px] text-primary hover:underline font-bold uppercase tracking-wider">View all</Link>
       </div>
       
-      <div className="divide-y divide-gray-100 flex-1 overflow-y-auto">
+      <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
         {displayEvents.map((event) => (
-          <div key={event.id} className="p-5 hover:bg-gray-50 transition-colors group">
-            <div className="flex justify-between items-start mb-2">
-              <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">{event.name}</h4>
-              <span className={`text-xs px-2.5 py-1 rounded-full font-medium whitespace-nowrap ml-3 ${getStatusColor(event.status)}`}>
+          <div key={event.id} className="p-5 bg-surface-low rounded-2xl hover:bg-surface-lowest transition-all duration-300 group hover:shadow-editorial border-transparent border-2 hover:border-primary/5">
+            <div className="flex justify-between items-start mb-4">
+              <h4 className="font-bold text-[15px] text-on-surface group-hover:text-primary transition-colors line-clamp-1">{event.name}</h4>
+              <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest whitespace-nowrap ml-3 ${getStatusColor(event.status)}`}>
                 {event.status.replace('_', ' ')}
               </span>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-500 mt-3">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
+            <div className="grid grid-cols-1 gap-2 text-[13px] text-on-surface-variant/70 font-medium">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-3.5 h-3.5 text-primary/60 shrink-0" />
                 <span className="truncate">{formatDate(event.date)}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
+              <div className="flex items-center gap-2">
+                <MapPin className="w-3.5 h-3.5 text-primary/60 shrink-0" />
                 <span className="truncate">{event.location}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-gray-400 shrink-0" />
-                <span>{event.attendees} / {event.capacity}</span>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex -space-x-2 mr-2">
+                   {[1,2,3].map(i => (
+                     <div key={i} className="w-6 h-6 rounded-full bg-surface-lowest border-2 border-surface-low flex items-center justify-center text-[8px] font-bold">
+                        {String.fromCharCode(64 + i)}
+                     </div>
+                   ))}
+                </div>
+                <span className="text-on-surface font-bold">{event.attendees} / {event.capacity} registered</span>
               </div>
             </div>
           </div>

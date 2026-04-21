@@ -87,34 +87,36 @@ export default function Dashboard() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-6 pb-8"
+      className="space-y-12 pb-12"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500 mt-1">Welcome back, {user?.name || 'Admin'}. Here is what's happening at Swahilipot Hub.</p>
+          <h1 className="text-5xl font-bold text-on-surface tracking-tighter leading-none mb-4">Work Hub</h1>
+          <p className="text-on-surface-variant font-medium text-lg">
+            Welcome back, <span className="text-primary font-bold">{user?.name || 'Admin'}</span>. Here is the pulse of the community today.
+          </p>
         </div>
         
-        <div className="flex gap-3">
-          <select className="bg-white border text-sm border-gray-200 text-gray-700 py-2 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm transition-all">
+        <div className="flex gap-4">
+          <select className="bg-surface-low text-sm text-on-surface font-bold py-3 px-6 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
             <option>This Month</option>
             <option>Last Month</option>
             <option>This Year</option>
           </select>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium shadow-sm shadow-blue-500/20 transition-all text-sm">
+          <button className="btn-gradient py-3 px-8 rounded-full shadow-lg shadow-primary/20 text-sm font-bold">
             Export Report
           </button>
         </div>
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <motion.div variants={itemVariants}>
           <MetricCard 
             title="Total Members" 
             value={stats.totalMembers} 
-            icon={<Users className="w-6 h-6 text-blue-600" />}
-            colorClass="text-blue-600"
+            icon={<Users className="w-6 h-6 text-white" />}
+            colorClass="bg-primary shadow-xl shadow-primary/20"
             trend={{ value: 12.5, isPositive: true }}
           />
         </motion.div>
@@ -123,8 +125,8 @@ export default function Dashboard() {
           <MetricCard 
             title="Active Programs" 
             value={stats.activePrograms} 
-            icon={<TrendingUp className="w-6 h-6 text-green-600" />}
-            colorClass="text-green-600"
+            icon={<TrendingUp className="w-6 h-6 text-white" />}
+            colorClass="bg-secondary shadow-xl shadow-secondary/20"
             trend={{ value: 4.2, isPositive: true }}
           />
         </motion.div>
@@ -133,8 +135,8 @@ export default function Dashboard() {
           <MetricCard 
             title="Events Summary" 
             value={stats.eventsThisMonth} 
-            icon={<CalendarDays className="w-6 h-6 text-amber-500" />}
-            colorClass="text-amber-500"
+            icon={<CalendarDays className="w-6 h-6 text-white" />}
+            colorClass="bg-amber-500 shadow-xl shadow-amber-500/20"
             trend={{ value: 2.1, isPositive: false }}
           />
         </motion.div>
@@ -143,31 +145,43 @@ export default function Dashboard() {
           <MetricCard 
             title="Avg Satisfaction" 
             value={stats.satisfaction} 
-            icon={<MessageCircle className="w-6 h-6 text-purple-600" />}
-            colorClass="text-purple-600"
+            icon={<MessageCircle className="w-6 h-6 text-white" />}
+            colorClass="bg-purple-600 shadow-xl shadow-purple-600/20"
             trend={{ value: 0.2, isPositive: true }}
           />
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <motion.div variants={itemVariants} className="lg:col-span-2">
-          <ProgramChart 
-            data={programData.map(p => ({
-              name: p.name,
-              active: p.totalAttendance,
-              completed: p.eventsTotal
-            }))}
-          />
+          <div className="card-editorial p-10 h-full">
+            <h3 className="text-2xl font-bold mb-8 text-on-surface">Program Performance</h3>
+            <ProgramChart 
+              data={programData.map(p => ({
+                name: p.name,
+                active: p.totalAttendance,
+                completed: p.eventsTotal
+              }))}
+            />
+          </div>
         </motion.div>
         
         <motion.div variants={itemVariants} className="lg:col-span-1">
-          <RecentEventsList events={recentEvents} />
+          <div className="card-editorial p-8 h-full">
+            <h3 className="text-xl font-bold mb-6 text-on-surface">Recent Activity</h3>
+            <RecentEventsList events={recentEvents} />
+          </div>
         </motion.div>
       </div>
 
-      <motion.div variants={itemVariants} className="pt-2">
-        <AtRiskMembersList members={atRiskMembers} />
+      <motion.div variants={itemVariants}>
+        <div className="card-editorial p-10">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-2xl font-bold text-on-surface">At-Risk Members</h3>
+            <span className="px-4 py-1.5 bg-red-50 text-red-600 rounded-full text-xs font-bold uppercase tracking-widest">Action Required</span>
+          </div>
+          <AtRiskMembersList members={atRiskMembers} />
+        </div>
       </motion.div>
       
     </motion.div>

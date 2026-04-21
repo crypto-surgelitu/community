@@ -15,31 +15,29 @@ export function MetricCard({ title, value, icon, trend, colorClass = "text-blue-
 
   return (
     <motion.div
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow relative overflow-hidden"
+      whileHover={{ y: -8, transition: { duration: 0.3 } }}
+      className="card-editorial p-6 hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
     >
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
-          <h3 className="text-3xl font-bold text-gray-900 flex items-center">
+          <p className="text-[13px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">{title}</p>
+          <h3 className="text-4xl font-bold text-on-surface flex items-center tracking-tighter">
             {hasStarted ? <motion.span>{displayValue}</motion.span> : 0}
           </h3>
         </div>
-        <div className={`p-3 rounded-lg bg-gray-50 ${colorClass}`}>
+        <div className={`p-4 rounded-2xl transition-transform group-hover:scale-110 duration-500 ${colorClass}`}>
           {icon}
         </div>
       </div>
       
       {trend && (
-        <div className="mt-4 flex items-center text-sm">
-          <span className={`font-medium ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
-            {trend.isPositive ? '+' : '-'}{Math.abs(trend.value)}%
+        <div className="mt-6 flex items-center text-xs font-bold uppercase tracking-wider">
+          <span className={`px-2 py-1 rounded-md ${trend.isPositive ? 'bg-secondary/10 text-secondary' : 'bg-red-50 text-red-600'}`}>
+            {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
           </span>
-          <span className="text-gray-400 ml-2">vs last month</span>
+          <span className="text-on-surface-variant/50 ml-3">Growth Index</span>
         </div>
       )}
-      
-      <div className={`absolute bottom-0 left-0 h-1 w-full opacity-20 bg-current ${colorClass}`}></div>
     </motion.div>
   );
 }
