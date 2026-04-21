@@ -6,6 +6,7 @@ import feedbackRoutes from './feedback.js';
 import dashboardRoutes from './dashboard.js';
 import adminRoutes from './admin.js';
 import templateRoutes from './templates.js';
+import otpRoutes from './otp.js';
 
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.use('/feedback', feedbackRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/admin', adminRoutes);
 router.use('/templates', templateRoutes);
+router.use('/otp', otpRoutes);
 
 export default router;

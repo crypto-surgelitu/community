@@ -2,7 +2,14 @@ export const ROLES = {
   ADMIN: 'admin',
   COMMUNITY_MANAGER: 'community_manager',
   CASE_MANAGER: 'case_manager',
-  AREA_MANAGER: 'area_manager'
+  AREA_MANAGER: 'area_manager',
+  MENTOR: 'mentor',
+  MENTEE: 'mentee',
+  YOUTH_ENGAGEMENT_LEADER: 'youth_engagement_leader',
+  COMMUNITY_ENGAGEMENT_LEADER: 'community_engagement_leader',
+  COMMUNITY_ENGAGEMENT_ASSOCIATE: 'community_engagement_associate',
+  ASSISTANT_PROJECT_ASSOCIATE: 'assistant_project_associate',
+  OTHER: 'other'
 };
 
 export const ROLE_HIERARCHY = {

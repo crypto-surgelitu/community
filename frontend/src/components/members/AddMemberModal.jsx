@@ -9,7 +9,7 @@ import { useNotification } from '../../context/NotificationContext';
 const memberSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
-  phone: z.string().pattern(/^\+?[0-9]{10,15}$/, 'Invalid phone number (10-15 digits)'),
+  phone: z.string().regex(/^\+?[0-9]{10,15}$/, 'Invalid phone number (10-15 digits)'),
   zoneId: z.string().uuid('Please select a zone'),
 });
 

@@ -4,15 +4,20 @@ import { z } from 'zod';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
-import { Loader2, Mail, Lock, User, MapPin } from 'lucide-react';
+import { Loader2, Mail, Lock, User, MapPin, Briefcase } from 'lucide-react';
 
 const signupSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string().min(8, 'Please confirm your password'),
   zone: z.enum(['Kisauni', 'Nyali', 'Likoni', 'Mvita', 'Changamwe', 'Jomvu'], {
     required_error: 'Please select a zone.'
   }),
+  role: z.enum(['case_manager', 'area_manager', 'mentor', 'mentee', 'youth_engagement_leader', 'community_engagement_leader', 'community_engagement_associate', 'assistant_project_associate', 'other']).default('case_manager'),
+}).refine(data => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
 });
 
 export function SignupForm() {
@@ -107,6 +112,32 @@ export function SignupForm() {
       </div>
 
       <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Select Role</label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Briefcase className="h-5 w-5 text-gray-400" />
+          </div>
+          <select
+            {...register('role')}
+            className={`block w-full pl-10 pr-3 py-2.5 bg-white border rounded-xl text-sm transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.role ? 'border-red-300 ring-red-100' : 'border-gray-200'
+            }`}
+          >
+            <option value="case_manager">Case Manager</option>
+            <option value="area_manager">Area Manager</option>
+            <option value="mentor">Mentor</option>
+            <option value="mentee">Mentee</option>
+            <option value="youth_engagement_leader">Youth Engagement Leader</option>
+            <option value="community_engagement_leader">Community Engagement Leader</option>
+            <option value="community_engagement_associate">Community Engagement Associate</option>
+            <option value="assistant_project_associate">Assistant Project Associate</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>}
+      </div>
+
+      <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -123,6 +154,26 @@ export function SignupForm() {
         </div>
         {errors.password && (
           <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Lock className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            {...register('confirmPassword')}
+            type="password"
+            className={`block w-full pl-10 pr-3 py-2.5 border rounded-xl text-sm transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.confirmPassword ? 'border-red-300 ring-red-100' : 'border-gray-200'
+            }`}
+            placeholder="••••••••"
+          />
+        </div>
+        {errors.confirmPassword && (
+          <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
         )}
       </div>
 

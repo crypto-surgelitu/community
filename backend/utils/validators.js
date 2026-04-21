@@ -10,7 +10,9 @@ export const schemas = {
     name: Joi.string().min(3).max(255).required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
-    zone: Joi.string().required()
+    confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
+    zone: Joi.string().required(),
+    role: Joi.string().valid('case_manager', 'area_manager', 'mentor', 'mentee', 'youth_engagement_leader', 'community_engagement_leader', 'community_engagement_associate', 'assistant_project_associate', 'other').default('case_manager')
   }),
 
   changePassword: Joi.object({
@@ -90,14 +92,14 @@ export const schemas = {
   createUser: Joi.object({
     email: Joi.string().email().required(),
     name: Joi.string().min(3).max(255).required(),
-    role: Joi.string().valid('admin', 'community_manager', 'case_manager', 'area_manager').required(),
+    role: Joi.string().valid('admin', 'community_manager', 'case_manager', 'area_manager', 'mentor', 'mentee', 'youth_engagement_leader', 'community_engagement_leader', 'community_engagement_associate', 'assistant_project_associate', 'other').required(),
     phone: Joi.string().pattern(/^\+?[0-9]{10,15}$/).allow(null),
     sendInviteEmail: Joi.boolean().default(false)
   }),
 
   updateUser: Joi.object({
     name: Joi.string().min(3).max(255),
-    role: Joi.string().valid('admin', 'community_manager', 'case_manager', 'area_manager'),
+    role: Joi.string().valid('admin', 'community_manager', 'case_manager', 'area_manager', 'mentor', 'mentee', 'youth_engagement_leader', 'community_engagement_leader', 'community_engagement_associate', 'assistant_project_associate', 'other'),
     status: Joi.string().valid('active', 'inactive', 'suspended')
   }),
 

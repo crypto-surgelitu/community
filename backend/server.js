@@ -1,10 +1,13 @@
 import app from './app.js';
 import { connectDB, sequelize } from './config/database.js';
 import { config } from './config/environment.js';
+import { initEmailService } from './utils/emailService.js';
 
 const startServer = async () => {
   try {
     await connectDB();
+    
+    initEmailService();
     
     app.listen(config.port, () => {
       console.log(`Server running on port ${config.port}`);

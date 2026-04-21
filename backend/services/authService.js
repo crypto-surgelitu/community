@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models/index.js';
 import { config } from '../config/environment.js';
 import { logger } from '../utils/logger.js';
+import { getPermissionsForRole, SELF_SIGNUP_ROLES } from '../config/permissions.js';
 
 export const authService = {
   async login(email, password) {
@@ -33,6 +34,8 @@ export const authService = {
     
     logger.log('User logged in', { userId: user.id, email });
     
+    const permissions = getPermissionsForRole(user.role);
+    
     return {
       token,
       user: {
@@ -42,6 +45,7 @@ export const authService = {
         role: user.role,
         phone: user.phone
       },
+      permissions,
       expiresIn: config.jwt.expire
     };
   },
@@ -90,12 +94,14 @@ export const authService = {
       }
     }
     
+    const role = SELF_SIGNUP_ROLES.includes(data.role) ? data.role : 'case_manager';
+    
     const user = await User.create({
       email: data.email,
       password: data.password, // hashed by model hook
       name: data.name,
       zoneId: zoneId,
-      role: 'case_manager', // default role for self-signup
+      role: role,
       status: 'active'
     });
     

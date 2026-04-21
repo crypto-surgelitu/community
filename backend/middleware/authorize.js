@@ -1,4 +1,5 @@
 import { ROLES, ROLE_HIERARCHY } from '../config/constants.js';
+import { getPermissionsForRole, PERMISSIONS } from '../config/permissions.js';
 
 export function authorize(...allowedRoles) {
   return (req, res, next) => {
@@ -15,6 +16,52 @@ export function authorize(...allowedRoles) {
     });
     
     if (!hasPermission) {
+      return res.status(403).json({
+        error: 'You do not have permission for this action',
+        status: 403
+      });
+    }
+    
+    next();
+  };
+}
+
+export function requirePermission(...requiredPermissions) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Not authenticated', status: 401 });
+    }
+    
+    const userPermissions = getPermissionsForRole(req.user.role);
+    
+    const hasAnyPermission = requiredPermissions.some(permission => 
+      userPermissions.includes(permission)
+    );
+    
+    if (!hasAnyPermission) {
+      return res.status(403).json({
+        error: 'You do not have permission for this action',
+        status: 403
+      });
+    }
+    
+    next();
+  };
+}
+
+export function requireAllPermissions(...requiredPermissions) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Not authenticated', status: 401 });
+    }
+    
+    const userPermissions = getPermissionsForRole(req.user.role);
+    
+    const hasAllPermissions = requiredPermissions.every(permission => 
+      userPermissions.includes(permission)
+    );
+    
+    if (!hasAllPermissions) {
       return res.status(403).json({
         error: 'You do not have permission for this action',
         status: 403

@@ -13,7 +13,7 @@ export function ProgramChart({ data }) {
   const chartData = data && data.length > 0 ? data : defaultData;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 h-full min-h-[350px] flex flex-col">
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 min-h-[350px] flex flex-col">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-bold text-gray-900">Program Engagement</h3>
         <select className="text-sm border-gray-200 rounded-lg text-gray-600 focus:ring-blue-500 focus:border-blue-500 py-1">
@@ -22,8 +22,8 @@ export function ProgramChart({ data }) {
         </select>
       </div>
       
-      <div className="flex-1 w-full h-full">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="flex-1 min-h-[280px]">
+        <ResponsiveContainer width="100%" height={280}>
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
             <XAxis 

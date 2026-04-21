@@ -3,6 +3,7 @@ import { authService } from './authService.js';
 import { logger } from '../utils/logger.js';
 import { ROLES, USER_STATUS } from '../config/constants.js';
 import { generateTempPassword } from '../utils/helpers.js';
+import { sendEmail, emailTemplates } from '../utils/emailService.js';
 
 export const adminService = {
   async createUser(data) {
@@ -20,6 +21,12 @@ export const adminService = {
     });
     
     logger.log('User created by admin', { userId: user.id, email: user.email });
+
+    await sendEmail({
+      to: user.email,
+      subject: 'Your Account Has Been Created',
+      html: emailTemplates.accountCreated(user.name, user.email, tempPassword).html
+    });
     
     return {
       id: user.id,
@@ -53,6 +60,12 @@ export const adminService = {
     await user.update({ password: hashedPassword });
     
     logger.log('Password reset', { userId });
+
+    await sendEmail({
+      to: user.email,
+      subject: 'Your Password Has Been Reset',
+      html: emailTemplates.passwordResetNotification(user.name, user.email, tempPassword).html
+    });
     
     return {
       message: `Password reset. Temporary password: ${tempPassword}`,
